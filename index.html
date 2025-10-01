@@ -5,113 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tube Bend Calculator</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#b00020">
+  <meta name="theme-color" content="#0d0d0d">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <style>
     :root { --bg:#0d0d0d; --card:#151515; --accent:#b00020; --text:#f5f5f5; --muted:#bdbdbd; }
     *{ box-sizing:border-box; }
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
-    header{ padding:16px 20px; background:linear-gradient(90deg, #1b1b1b, #191919); border-bottom:1px solid #222; position:sticky; top:0; z-index:10;}
-    h1{ font-size:20px; margin:0; letter-spacing:0.5px; }
-    main{ padding:18px; max-width:1200px; margin:0 auto; }
-    .card{ background:var(--card); border:1px solid #222; border-radius:14px; padding:16px; margin-bottom:16px; box-shadow:0 1px 0 rgba(255,255,255,.04), 0 6px 24px rgba(0,0,0,.35); }
-    .row{ display:flex; gap:12px; flex-wrap:wrap; }
-    .col{ flex:1 1 180px; min-width:180px; }
-    label{ display:block; font-size:13px; color:var(--muted); margin:6px 0; }
-    input, select{ width:100%; background:#0f0f0f; color:var(--text); border:1px solid #2a2a2a; border-radius:10px; padding:12px; font-size:16px; outline:none; }
-    input:focus, select:focus{ border-color:#444; }
-    .btn{ display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; }
-    .btn.secondary{ background:#262626; border:1px solid #333; }
-    .btn.ghost{ background:#202020; border:1px dashed #3a3a3a; color:#ddd; }
-    .hint{ font-size:12px; color:var(--muted); }
-    .grid{ display:grid; grid-template-columns:1fr auto; gap:8px 12px; align-items:center; }
-    .bendRow{ display:grid; grid-template-columns:repeat(9,minmax(100px,1fr)) 42px; gap:10px; align-items:center; margin-top:10px; }
-    .x{ cursor:pointer; text-align:center; font-weight:bold; }
-    table{ width:100%; border-collapse:collapse; font-size:14px; }
-    th,td{ padding:8px; border-bottom:1px solid #2a2a2a; text-align:right; }
-    th:first-child,td:first-child{ text-align:left; }
-    canvas{ width:100%; height:160px; background:#101010; border:1px solid #2a2a2a; border-radius:10px; }
-    .mode{ display:flex; align-items:center; gap:8px; }
+    header{ padding:12px 16px; background:#121212; border-bottom:1px solid #222; position:sticky; top:0; z-index:10;}
+    h1{ font-size:18px; margin:0; letter-spacing:.2px; }
+    main{ padding:16px; max-width:1300px; margin:0 auto; }
+    .grid2{ display:grid; grid-template-columns:380px 1fr; gap:16px; }
+    .card{ background:#151515; border:1px solid #222; border-radius:14px; padding:14px; }
+    label{ display:block; font-size:12px; color:#bdbdbd; margin:6px 0; }
+    input, select{ width:100%; background:#0f0f0f; color:#f5f5f5; border:1px solid #2a2a2a; border-radius:10px; padding:10px; font-size:14px; }
+    button{ background:var(--accent); color:white; border:none; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer; }
+    button.secondary{ background:#262626; border:1px solid #333; }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tube{ border:1px solid #2a2a2a; border-radius:10px; padding:10px; margin-bottom:10px; }
+    .bendRow{ display:grid; grid-template-columns:repeat(5,1fr) 28px; gap:6px; align-items:center; margin-top:6px; }
+    .x{ text-align:center; cursor:pointer; user-select:none; }
+    canvas#viewer{ width:100%; height:520px; background:#0f0f0f; border:1px solid #222; border-radius:12px; }
+    .muted{ color:#9a9a9a; font-size:12px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Tube Bend Calculator (v4 Targets)</h1>
-  </header>
-  <main>
+  <header><h1>Tube Bend Calculator — v5 (3D + STL/GLB export)</h1></header>
+  <main class="grid2">
     <section class="card">
       <div class="row">
-        <div class="col">
-          <label for="units">Units</label>
-          <select id="units">
-            <option value="in">Inches</option>
-            <option value="mm">Millimeters</option>
-          </select>
+        <div style="flex:1">
+          <label>Units</label>
+          <select id="units"><option value="in">Inches</option><option value="mm">Millimeters</option></select>
         </div>
-        <div class="col">
-          <label for="material">Material</label>
-          <select id="material">
-            <option value="steel">Steel/Chromoly</option>
-            <option value="aluminum">Aluminum 6061</option>
-          </select>
-          <div class="hint">Used for weight estimate</div>
+        <div style="flex:1">
+          <label>Material</label>
+          <select id="material"><option value="steel">Steel/Chromoly</option><option value="aluminum">Aluminum 6061</option></select>
         </div>
-        <div class="col">
-          <label for="od">Tube OD</label>
-          <input id="od" type="number" step="any" value="1.75">
+        <div style="flex:1">
+          <label>OD</label><input id="od" type="number" step="any" value="1.75">
         </div>
-        <div class="col">
-          <label for="wall">Wall Thickness</label>
-          <input id="wall" type="number" step="any" value="0.120">
-        </div>
-        <div class="col">
-          <label>&nbsp;</label>
-          <button id="example" class="btn secondary">Use Example</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h3>Sequence</h3>
-      <p class="hint">Start Tail & End Tail set straight at the beginning and end. For each bend, use <b>Manual</b> (enter Straight-after) or <b>Target</b> (enter desired Rise/Run for that bend's end tangent). In Target mode we suggest the straight-after needed (along current heading) to reach the target and show remaining X/Y error.</p>
-      <div class="row">
-        <div class="col">
-          <label for="tail1">Start Tail</label>
-          <input id="tail1" type="number" step="any" value="2">
-        </div>
-        <div class="col">
-          <label for="tail2">End Tail</label>
-          <input id="tail2" type="number" step="any" value="2">
+        <div style="flex:1">
+          <label>Wall</label><input id="wall" type="number" step="any" value="0.120">
         </div>
       </div>
 
-      <div id="bends"></div>
-      <div style="height:10px"></div>
-      <button id="addBend" class="btn ghost">+ Add Bend</button>
-    </section>
-
-    <section class="card">
-      <h3>Tangents & Coordinates</h3>
-      <div id="tableWrap"></div>
-      <div style="height:10px"></div>
-      <canvas id="timeline" width="1100" height="160"></canvas>
-    </section>
-
-    <section class="card">
-      <div class="grid">
-        <div>Total straight (tails + straights)</div><div id="straight" class="hint">–</div>
-        <div>Total arc length</div><div id="arcTotal" class="hint">–</div>
-        <div>Total cut length</div><div id="total" class="hint">–</div>
-        <div>Estimated weight</div><div id="weight" class="hint">–</div>
+      <div class="row" style="margin-top:10px">
+        <button id="addTube" class="secondary">+ Add Tube</button>
+        <button id="example" class="secondary">Load Example</button>
       </div>
-      <div style="height:10px"></div>
-      <button id="calc" class="btn">Recalculate</button>
+
+      <div id="tubes"></div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="exportSTL">Export Current Tube (.stl)</button>
+        <button id="exportGLB" class="secondary">Export All Tubes (.glb)</button>
+      </div>
+      <p class="muted">Tip: Touch/drag in the 3D view to orbit, wheel/pinch to zoom, right-drag to pan.</p>
+    </section>
+
+    <section class="card">
+      <canvas id="viewer"></canvas>
+      <div class="row" style="margin-top:10px">
+        <div style="flex:1"><label>Total Straight</label><div id="straight" class="muted">–</div></div>
+        <div style="flex:1"><label>Total Arc</label><div id="arcTotal" class="muted">–</div></div>
+        <div style="flex:1"><label>Total Cut Length</label><div id="total" class="muted">–</div></div>
+        <div style="flex:1"><label>Estimated Weight</label><div id="weight" class="muted">–</div></div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    Build: 2025-10-01 12:06 UTC • Works offline • Save to Home Screen to install.
-  </footer>
+  <!-- Three.js & exporters (CDN) -->
+  <script src="https://unpkg.com/three@0.157.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.157.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.157.0/examples/js/exporters/STLExporter.js"></script>
+  <script src="https://unpkg.com/three@0.157.0/examples/js/exporters/GLTFExporter.js"></script>
 
   <script src="script.js"></script>
 </body>
