@@ -1,7 +1,6 @@
-Tube Bend Calculator — Multi-bend PWA (v2)
+Tube Bend Calculator — v3 (Tangents)
 
-• Add unlimited bends. Each bend has Angle, CLR, and a Straight-after value.
-• Enter start/end tails.
-• Enter tube OD + wall thickness and material (steel/aluminum) for a weight estimate.
-• Units toggle (in/mm). Works offline and is installable via Add to Home Screen.
-• Bend mark column shows the end-of-bend mark from the cut end.
+• Shows Start Tangent (ST) and End Tangent (ET) for each bend (distance from start cut along CL).
+• Table + timeline visualize where to start each bend.
+• Multi-bend, OD/wall, material weight estimate.
+• PWA: works offline, install via Add to Home Screen.

@@ -13,7 +13,7 @@
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
     header{ padding:16px 20px; background:linear-gradient(90deg, #1b1b1b, #191919); border-bottom:1px solid #222; position:sticky; top:0; z-index:10;}
     h1{ font-size:20px; margin:0; letter-spacing:0.5px; }
-    main{ padding:18px; max-width:1000px; margin:0 auto; }
+    main{ padding:18px; max-width:1100px; margin:0 auto; }
     .card{ background:var(--card); border:1px solid #222; border-radius:14px; padding:16px; margin-bottom:16px; box-shadow:0 1px 0 rgba(255,255,255,.04), 0 6px 24px rgba(0,0,0,.35); }
     .row{ display:flex; gap:12px; flex-wrap:wrap; }
     .col{ flex:1 1 180px; min-width:180px; }
@@ -23,19 +23,19 @@
     .btn{ display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; }
     .btn.secondary{ background:#262626; border:1px solid #333; }
     .btn.ghost{ background:#202020; border:1px dashed #3a3a3a; color:#ddd; }
-    .btn:active{ transform:translateY(1px); }
     .hint{ font-size:12px; color:var(--muted); }
-    .result{ font-size:28px; font-weight:800; }
     .grid{ display:grid; grid-template-columns:1fr auto; gap:8px 12px; align-items:center; }
-    footer{ text-align:center; padding:20px; color:#8a8a8a; font-size:12px; }
-    code{ background:#111; padding:2px 6px; border-radius:6px; }
-    .bendRow{ display:grid; grid-template-columns:repeat(5,minmax(110px,1fr)) 40px; gap:10px; align-items:center; margin-top:10px; }
+    .bendRow{ display:grid; grid-template-columns:repeat(6,minmax(110px,1fr)) 42px; gap:10px; align-items:center; margin-top:10px; }
     .x{ cursor:pointer; text-align:center; font-weight:bold; }
+    table{ width:100%; border-collapse:collapse; font-size:14px; }
+    th,td{ padding:8px; border-bottom:1px solid #2a2a2a; text-align:right; }
+    th:first-child,td:first-child{ text-align:left; }
+    canvas{ width:100%; height:120px; background:#101010; border:1px solid #2a2a2a; border-radius:10px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Tube Bend Calculator (Multi‑bend)</h1>
+    <h1>Tube Bend Calculator (Tangents)</h1>
   </header>
   <main>
     <section class="card">
@@ -72,15 +72,15 @@
 
     <section class="card">
       <h3>Sequence</h3>
-      <p class="hint">Enter a tail, then any number of bend + straight sections, and finish with a final tail. Totals are along the tube centerline.</p>
+      <p class="hint">Enter start tail, then bends (Angle° & CLR) with a straight AFTER each bend. The app computes the <b>Start Tangent (ST)</b> and <b>End Tangent (ET)</b> positions for every bend, measured from the starting cut end along the tube centerline.</p>
       <div class="row">
         <div class="col">
           <label for="tail1">Start Tail</label>
-          <input id="tail1" type="number" step="any" value="0">
+          <input id="tail1" type="number" step="any" value="2">
         </div>
         <div class="col">
           <label for="tail2">End Tail</label>
-          <input id="tail2" type="number" step="any" value="0">
+          <input id="tail2" type="number" step="any" value="2">
         </div>
       </div>
 
@@ -90,21 +90,28 @@
     </section>
 
     <section class="card">
+      <h3>Tangent Table</h3>
+      <div class="hint">All distances measured from the starting cut end along the tube centerline.</div>
+      <div style="height:10px"></div>
+      <div id="tableWrap"></div>
+      <div style="height:10px"></div>
+      <canvas id="timeline" width="900" height="120"></canvas>
+    </section>
+
+    <section class="card">
       <div class="grid">
-        <div>Total straight (sum of straights & tails)</div><div id="straight" class="hint">–</div>
+        <div>Total straight (tails + straights)</div><div id="straight" class="hint">–</div>
         <div>Total arc length</div><div id="arcTotal" class="hint">–</div>
-        <div style="margin-top:6px;border-top:1px solid #2a2a2a"></div><div></div>
-        <div class="result">TOTAL CUT LENGTH</div><div id="total" class="result">–</div>
+        <div>Total cut length</div><div id="total" class="hint">–</div>
         <div>Estimated weight</div><div id="weight" class="hint">–</div>
       </div>
       <div style="height:10px"></div>
-      <button id="calc" class="btn">Calculate</button>
-      <p class="hint" style="margin-top:10px" id="marks"></p>
+      <button id="calc" class="btn">Recalculate</button>
     </section>
   </main>
 
   <footer>
-    Build: 2025-10-01 02:55 UTC • Works offline • Save to Home Screen to install.
+    Build: 2025-10-01 03:52 UTC • Works offline • Save to Home Screen to install.
   </footer>
 
   <script src="script.js"></script>
