@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tube Bend Calculator — v5 Lite</title>
+  <title>Tube Bend Calculator — v5 Lite+</title>
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0d0d0d">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -13,22 +13,24 @@
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
     header{ padding:14px 16px; background:#121212; border-bottom:1px solid #222; position:sticky; top:0; z-index:10;}
     h1{ font-size:18px; margin:0; letter-spacing:.2px; }
-    main{ padding:16px; max-width:1000px; margin:0 auto; }
+    main{ padding:16px; max-width:1100px; margin:0 auto; }
     .card{ background:#151515; border:1px solid #222; border-radius:14px; padding:14px; margin-bottom:14px; }
     label{ display:block; font-size:12px; color:#bdbdbd; margin:6px 0; }
     input, select{ width:100%; background:#0f0f0f; color:#f5f5f5; border:1px solid #2a2a2a; border-radius:10px; padding:10px; font-size:14px; }
     .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    .tube{ border:1px solid #2a2a2a; border-radius:10px; padding:10px; margin-bottom:10px; }
-    .bendRow{ display:grid; grid-template-columns:repeat(6,1fr) 28px; gap:6px; align-items:center; margin-top:6px; }
-    .x{ text-align:center; cursor:pointer; user-select:none; }
-    canvas#sketch{ width:100%; height:200px; background:#0f0f0f; border:1px solid #222; border-radius:12px; }
+    .bendRow{ display:grid; grid-template-columns:repeat(6,1fr); gap:6px; align-items:center; margin-top:10px; }
+    .bendOut{ grid-column:1/-1; display:grid; grid-template-columns:repeat(6,1fr); gap:8px; font-size:12px; color:#ccc; }
+    .xBtn{ grid-column:1/-1; text-align:right; }
+    .x{ display:inline-block; padding:4px 8px; border:1px solid #333; border-radius:8px; cursor:pointer; user-select:none; }
+    canvas#sketch{ width:100%; height:260px; background:#0f0f0f; border:1px solid #222; border-radius:12px; }
     .muted{ color:#9a9a9a; font-size:12px; }
     button{ background:var(--accent); color:white; border:none; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer; }
     button.secondary{ background:#262626; border:1px solid #333; }
+    small.label{ display:block; color:#aaa; font-size:11px; margin-top:2px; }
   </style>
 </head>
 <body>
-  <header><h1>Tube Bend Calculator — v5 Lite</h1></header>
+  <header><h1>Tube Bend Calculator — v5 Lite+</h1></header>
   <main>
     <section class="card">
       <div class="row">
@@ -52,7 +54,7 @@
     <section class="card" id="tubeCard">
       <div class="row">
         <div style="flex:2"><label>Tube Name</label><input id="tubeName" value="Tube 1"></div>
-        <div style="flex:1"><label>Start Tail</label><input id="startTail" type="number" step="any" value="2"></div>
+        <div style="flex:1"><label>Start Tail (mark from cut)</label><input id="startTail" type="number" step="any" value="2"></div>
         <div style="flex:1"><label>End Tail</label><input id="endTail" type="number" step="any" value="2"></div>
       </div>
       <div class="row" style="margin-top:8px">
@@ -64,8 +66,9 @@
     </section>
 
     <section class="card">
-      <h3>2D Sketch</h3>
-      <canvas id="sketch" width="900" height="200"></canvas>
+      <h3>Side View (Roll Bar Orientation)</h3>
+      <p class="muted">X = run (left→right), Y = rise (up). Grid & dimensions shown.</p>
+      <canvas id="sketch" width="1000" height="260"></canvas>
     </section>
 
     <section class="card">
