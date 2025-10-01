@@ -1,6 +1,7 @@
-Tube Bend Calculator — v3 (Tangents)
+Tube Bend Calculator — v4 (Targets per Bend)
 
-• Shows Start Tangent (ST) and End Tangent (ET) for each bend (distance from start cut along CL).
-• Table + timeline visualize where to start each bend.
-• Multi-bend, OD/wall, material weight estimate.
-• PWA: works offline, install via Add to Home Screen.
+• Manual or Target mode per bend.
+• Optional Target Run (X) and Target Rise (Y) for each bend's end tangent.
+• Suggests straight-after (along current heading) to hit targets; shows remaining X/Y error.
+• Chained 2D geometry for arcs and straights; tangent marks included.
+• PWA: works offline, Add to Home Screen.
