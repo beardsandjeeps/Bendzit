@@ -1,9 +1,8 @@
-Tube Bend Calculator — v5 (3D + STL/GLB export)
+Tube Bend Calculator — v5 Lite (PWA, autosave, per-tube PDF)
 
-• Multi-tube scene with per‑tube color, position, rotation.
-• 3D preview (Three.js), solid tube sweep along centerline.
-• STL export (current tube) and GLB export (all tubes).
-• Manual or target hints per bend (enter optional X/Y targets; see suggested straight‑after via hover—internal fields).
-• Works offline as a PWA.
-
-Note: Browser STEP export requires heavy CAD kernels. For STEP, we recommend exporting STL/GLB from the app and converting to STEP in CAD, or we can later add a WASM-based CAD kernel.
+• Inputs: Tube name, OD×wall, start/end tails; per-bend Angle, CLR, optional Target X/Y, straight-after.
+• Outputs: Start mark suggestion, ET (X,Y), suggested straight-after to hit targets (override allowed) and ΔX/ΔY error if overridden.
+• Visual: Full-width 2D sketch of the tube (side view).
+• PDF: Per-tube cut sheet with header, bend table, full-width sketch, total cut length, and estimated weight.
+• PWA: Works offline; Add to Home Screen.
+• Autosave: Restores your last tube on reopen.
