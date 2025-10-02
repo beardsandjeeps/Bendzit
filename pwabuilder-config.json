@@ -1,0 +1,16 @@
+{
+  "$schema": "https://aka.ms/pwabuilder-manifest-detection-schema.json",
+  "siteUrl": "https://yourusername.github.io/tube-bend-app/",
+  "manifestUrl": "https://yourusername.github.io/tube-bend-app/manifest.webmanifest",
+  "meta": {
+    "generatedBy": "GPT-5 TubeCalc v4.1.1",
+    "created": true
+  },
+  "iOS": {
+    "supported": true,
+    "applePayCapable": false
+  },
+  "android": {
+    "supported": true
+  }
+}

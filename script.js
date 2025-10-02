@@ -1,8 +1,8 @@
-(()=> {
+document.addEventListener('DOMContentLoaded', () => {
   const $ = (id) => document.getElementById(id);
   const bendsDiv = $('bends');
   const toNum = (v) => { v = parseFloat(v); return isNaN(v) ? 0 : v; };
-  const unitFactor = () => $('units').value === 'mm' ? 25.4 : 1; // UI -> inches factor
+  const unitFactor = () => $('units').value === 'mm' ? 25.4 : 1;
   const fmtLen = (inches) => {
     const u = $('units').value;
     const val = u === 'mm' ? inches*25.4 : inches;
@@ -10,10 +10,9 @@
   };
   const densityLbin3 = () => $('material').value === 'aluminum' ? 0.0975 : 0.283;
 
-  // ---- State ----
   function loadState(){
     try {
-      const s = JSON.parse(localStorage.getItem('tube_pwa_v41')||'null');
+      const s = JSON.parse(localStorage.getItem('tube_pwa_v411_pwabuilder')||'null');
       if (!s) return;
       $('units').value = s.units || 'in';
       $('material').value = s.material || 'steel';
@@ -41,10 +40,9 @@
       benderOffset: $('benderOffset').value,
       bends: getBends().map(b => ({angle:b.angle, clr:b.clr, straight:b.straight, tgtRun:b.tgtRun, tgtRise:b.tgtRise, stManual:b.stManual}))
     };
-    localStorage.setItem('tube_pwa_v41', JSON.stringify(state));
+    localStorage.setItem('tube_pwa_v411_pwabuilder', JSON.stringify(state));
   }
 
-  // ---- UI Rows ----
   function addBendRow(angle=59, clr=5.5, straight=10, tgtRun='', tgtRise='', stManual=''){
     const row = document.createElement('div');
     row.className = 'bendRow';
@@ -96,34 +94,34 @@
     bendsDiv.appendChild(row);
     calc(); saveState();
   }
+
   function getBends(){
     return Array.from(bendsDiv.querySelectorAll('.bendRow')).map((row)=> ({
       el: row,
-      angle: toNum(row.querySelector('.angle').value),
-      clr: toNum(row.querySelector('.clr').value),
-      straight: toNum(row.querySelector('.straight').value),
-      tgtRun: (row.querySelector('.tgtRun').value.trim()==='' ? null : toNum(row.querySelector('.tgtRun').value)),
-      tgtRise: (row.querySelector('.tgtRise').value.trim()==='' ? null : toNum(row.querySelector('.tgtRise').value)),
-      stManual: (row.querySelector('.stManual').value.trim()==='' ? null : toNum(row.querySelector('.stManual').value)),
+      angle: parseFloat(row.querySelector('.angle').value||'0'),
+      clr: parseFloat(row.querySelector('.clr').value||'0'),
+      straight: parseFloat(row.querySelector('.straight').value||'0'),
+      tgtRun: (row.querySelector('.tgtRun').value.trim()==='' ? null : parseFloat(row.querySelector('.tgtRun').value)),
+      tgtRise: (row.querySelector('.tgtRise').value.trim()==='' ? null : parseFloat(row.querySelector('.tgtRise').value)),
+      stManual: (row.querySelector('.stManual').value.trim()==='' ? null : parseFloat(row.querySelector('.stManual').value)),
     }));
   }
 
   let lastETs = [];
 
-  // ---- Core calc (internal inches) ----
   function calc(){
     const units = $('units').value;
     const toIn = (x)=> (units==='mm' ? x/25.4 : x);
     const toUI = (x)=> (units==='mm' ? x*25.4 : x);
 
     const notched = $('notched').checked;
-    const benderOffset = toNum($('benderOffset').value); // UI units
+    const benderOffset = parseFloat(($('benderOffset').value||'0'));
 
-    const od_ui = toNum($('od').value);
+    const od_ui = parseFloat(($('od').value||'0'));
     const notchAdj_ui = notched ? (od_ui/3.0) : 0;
 
-    const startTail = Math.max(0, toIn(toNum($('startTail').value) - notchAdj_ui));
-    const endTail = toIn(toNum($('endTail').value));
+    const startTail = Math.max(0, toIn(parseFloat(($('startTail').value||'0')) - notchAdj_ui));
+    const endTail = toIn(parseFloat(($('endTail').value||'0')));
 
     const bends = getBends();
 
@@ -131,7 +129,7 @@
     let arcTotal = 0;
     let linearPos = startTail;
 
-    let run=0, rise=0, heading=0; // heading 0 = +run
+    let run=0, rise=0, heading=0;
     const pathPts = [];
     pathPts.push({run:0, rise:0});
     pathPts.push({run:startTail, rise:0});
@@ -140,11 +138,11 @@
     lastETs = [];
 
     bends.forEach((b, idx)=>{
-      const a = b.angle*Math.PI/180;
+      const a = b.angle*Math.PI/180 || 0;
       const R = toIn(b.clr);
       const arc = R*a;
 
-      let stComputed = linearPos; // inches
+      let stComputed = linearPos;
       let stMark = stComputed;
       if (b.stManual!==null){ stMark = toIn(b.stManual); }
 
@@ -152,7 +150,6 @@
       const rise_et = rise - R*Math.cos(heading + a) + R*Math.cos(heading);
       const heading_after = heading + a;
 
-      // outputs
       const st_ui = toUI(stMark);
       const ptr_ui = Math.max(0, st_ui - benderOffset);
       b.el.querySelector('.stOut').textContent = fmtLen(stMark);
@@ -193,7 +190,7 @@
 
       straightSum += s;
       arcTotal += arc;
-      linearPos = stComputed + arc + s; // geometry progression
+      linearPos = stComputed + arc + s;
       run = run_next; rise = rise_next; heading = heading_after;
     });
 
@@ -201,8 +198,8 @@
 
     const total = straightSum + arcTotal;
 
-    const od_in = toIn(toNum($('od').value));
-    const wall_in = toIn(toNum($('wall').value));
+    const od_in = toIn(od_ui);
+    const wall_in = toIn(parseFloat(($('wall').value||'0')));
     const id = Math.max(0, od_in - 2*wall_in);
     const area = Math.PI/4 * (od_in*od_in - id*id);
     const weight = total * area * densityLbin3();
@@ -215,7 +212,6 @@
     drawSketch(pathPts, lastETs);
   }
 
-  // ---- Sketch ----
   function niceStep(range){
     const raw = range/8 || 1;
     const mag = Math.pow(10, Math.floor(Math.log10(raw)));
@@ -238,9 +234,8 @@
     ctx.closePath();
     ctx.fill();
   }
-
   function drawSketch(pathPts, ets){
-    const c = $('sketch');
+    const c = document.getElementById('sketch');
     const ctx = c.getContext('2d');
     ctx.clearRect(0,0,c.width,c.height);
     if (pathPts.length<2) return;
@@ -257,7 +252,7 @@
     const x0 = pad + (w - s*(maxRun-minRun))/2 - s*minRun;
     const y0 = pad + h - (h - s*(maxRise-minRise))/2 + s*minRise;
 
-    const units = $('units').value;
+    const units = document.getElementById('units').value;
     const stepRun = niceStep(maxRun-minRun);
     const stepRise = niceStep(maxRise-minRise);
     ctx.lineWidth = 1; ctx.strokeStyle = '#1f1f1f'; ctx.fillStyle='#777'; ctx.font='10px system-ui';
@@ -272,13 +267,12 @@
     }
 
     ctx.strokeStyle='#444'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(c.width-pad, y0); ctx.stroke(); // Run axis
-    ctx.beginPath(); ctx.moveTo(x0, pad); ctx.lineTo(x0, c.height-pad); ctx.stroke(); // Rise axis
+    ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(c.width-pad, y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, pad); ctx.lineTo(x0, c.height-pad); ctx.stroke();
     ctx.fillStyle='#aaa'; ctx.font='11px system-ui';
     ctx.fillText('Run →', c.width - 70, y0 - 6);
     ctx.save(); ctx.translate(x0 + 10, pad + 10); ctx.rotate(-Math.PI/2); ctx.fillText('Rise ↑', 0, 0); ctx.restore();
 
-    // path
     ctx.lineWidth = 2.5; ctx.strokeStyle = '#7cf';
     ctx.beginPath();
     ctx.moveTo(x0 + s*pathPts[0].run, y0 - s*pathPts[0].rise);
@@ -287,7 +281,6 @@
     }
     ctx.stroke();
 
-    // overall dims
     const overallRun = maxRun - minRun, overallRise = maxRise - minRise;
     ctx.strokeStyle='#aaa'; ctx.fillStyle='#ddd'; ctx.lineWidth=1;
 
@@ -305,14 +298,11 @@
     ctx.fillText(`Height (Rise): ${overallRise.toFixed(2)} ${units}`, 0, 0);
     ctx.restore();
 
-    // per-bend arrows
     ctx.setLineDash([5,4]); ctx.strokeStyle='#bbb'; ctx.fillStyle='#ddd';
     ets.forEach(pt=>{
       const Xp = x0 + s*pt.run; const Yp = y0 - s*pt.rise;
-      // run dim
       drawArrow(ctx, x0, Yp, Xp, Yp);
       ctx.fillText(`B${pt.idx} Run: ${pt.run.toFixed(2)} ${units}`, x0 + (Xp - x0)/2 - 40, Yp - 6);
-      // rise dim
       drawArrow(ctx, Xp, y0, Xp, Yp);
       ctx.save();
       ctx.translate(Xp + 8, y0 - (y0 - Yp)/2);
@@ -323,18 +313,17 @@
     ctx.setLineDash([]);
   }
 
-  // ---- PDF Export ----
   async function exportPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({orientation:'portrait', unit:'in', format:'letter'});
 
-    const name = $('tubeName').value;
-    const units = $('units').value;
-    const od = $('od').value, wall = $('wall').value;
-    const total = $('total').textContent;
-    const weight = $('weight').textContent;
-    const notched = $('notched').checked;
-    const bOffset = $('benderOffset').value;
+    const name = document.getElementById('tubeName').value;
+    const units = document.getElementById('units').value;
+    const od = document.getElementById('od').value, wall = document.getElementById('wall').value;
+    const total = document.getElementById('total').textContent;
+    const weight = document.getElementById('weight').textContent;
+    const notched = document.getElementById('notched').checked;
+    const bOffset = document.getElementById('benderOffset').value;
 
     doc.setFontSize(16);
     doc.text(`${name} — Cut Sheet`, 0.5, 0.7);
@@ -355,8 +344,8 @@
     const toIn = (x)=> (units==='mm' ? x/25.4 : x);
     const toUI = (x)=> (units==='mm' ? x*25.4 : x);
 
-    const startTail_ui = parseFloat($('startTail').value||'0');
-    const od_ui = parseFloat($('od').value||'0');
+    const startTail_ui = parseFloat(document.getElementById('startTail').value||'0');
+    const od_ui = parseFloat(document.getElementById('od').value||'0');
     const notch_ui = notched ? od_ui/3.0 : 0;
     const startTail = Math.max(0, toIn(startTail_ui - notch_ui));
 
@@ -402,13 +391,13 @@
       heading = heading_after;
     }
 
-    const sketch = $('sketch');
+    const sketch = document.getElementById('sketch');
     const imgData = sketch.toDataURL('image/png');
     doc.addImage(imgData, 'PNG', 0.5, 3.7, 7.5, 2.6);
 
     doc.setFontSize(11);
-    doc.text(`Total Cut Length: ${$('total').textContent}`, 0.5, 6.5);
-    doc.text(`Estimated Weight: ${$('weight').textContent}`, 4.5, 6.5);
+    doc.text(`Total Cut Length: ${document.getElementById('total').textContent}`, 0.5, 6.5);
+    doc.text(`Estimated Weight: ${document.getElementById('weight').textContent}`, 4.5, 6.5);
     doc.text("All marks from cut end along tube centerline. Notch adjustment and bender offset applied to pointer marks.", 0.5, 6.7);
 
     doc.save((name||'Tube') + '_CutSheet.pdf');
@@ -425,33 +414,30 @@
     return s;
   }
 
-  // Events
-  $('addBend').onclick = ()=> addBendRow();
-  $('example').onclick = ()=>{
-    $('tubeName').value = 'Driver A-Pillar';
-    $('startTail').value = '2';
-    $('endTail').value = '2';
-    $('units').value = 'in';
-    $('material').value = 'steel';
-    $('od').value = '1.75';
-    $('wall').value = '0.120';
-    $('notched').checked = true;
-    $('benderOffset').value = '4.25';
+  document.getElementById('addBend').onclick = ()=> addBendRow();
+  document.getElementById('example').onclick = ()=>{
+    document.getElementById('tubeName').value = 'Driver A-Pillar';
+    document.getElementById('startTail').value = '2';
+    document.getElementById('endTail').value = '2';
+    document.getElementById('units').value = 'in';
+    document.getElementById('material').value = 'steel';
+    document.getElementById('od').value = '1.75';
+    document.getElementById('wall').value = '0.120';
+    document.getElementById('notched').checked = True;
+    document.getElementById('benderOffset').value = '4.25';
     bendsDiv.innerHTML = '';
     addBendRow(59, 5.5, 13.33, 0, 16, '');
     calc(); saveState();
   };
-  ['units','material','od','wall','tubeName','startTail','endTail','notched','benderOffset'].forEach(id => $(id).addEventListener('input', ()=>{ calc(); saveState(); }));
+  ['units','material','od','wall','tubeName','startTail','endTail','notched','benderOffset'].forEach(id => document.getElementById(id).addEventListener('input', ()=>{ calc(); saveState(); }));
   document.addEventListener('input', (e)=>{ if (e.target && e.target.closest('.bendRow')) { calc(); saveState(); }});
-  $('exportPDF').onclick = exportPDF;
+  document.getElementById('exportPDF').onclick = exportPDF;
 
-  // Init
   if (bendsDiv.children.length===0) addBendRow();
   loadState();
   calc();
 
-  // PWA
   if ('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js');
   }
-})();
+});

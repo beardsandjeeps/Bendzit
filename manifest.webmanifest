@@ -1,10 +1,17 @@
 {
-  "name": "Tube Bend Calculator \u2014 v4.1",
-  "short_name": "TubeCalc v4.1",
+  "name": "Tube Bend Calculator",
+  "short_name": "TubeCalc",
+  "description": "A professional tube bending calculator with rise/run diagrams, cut sheets, and weight estimates. Built for fabricators, off-road builders, and race teams.",
   "start_url": ".",
+  "scope": ".",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0d0d0d",
   "theme_color": "#0d0d0d",
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",
